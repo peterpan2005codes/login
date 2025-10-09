@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Login Authentication System</title>
+<style>
+body { font-family: Arial; background: #f4f4f9; margin:0; padding:0; }
+.container { max-width: 400px; margin: 50px auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);}
+h2 { text-align: center; }
+input { width: 100%; padding: 10px; margin: 10px 0; }
+button { width: 100%; padding: 10px; background: #333; color: #fff; border: none; cursor: pointer; }
+button:hover { background: #555; }
+a { display: block; text-align: center; margin-top: 10px; color: #333; text-decoration: none; }
+p.error { color: red; text-align: center; }
+p.success { color: green; text-align: center; }
+</style>
+</head>
+<body>
+
+<div class="container" id="registerForm">
+  <h2>Register</h2>
+  <input type="text" id="regUsername" placeholder="Username" required>
+  <input type="email" id="regEmail" placeholder="Email" required>
+  <input type="password" id="regPassword" placeholder="Password" required>
+  <button onclick="register()">Register</button>
+  <a href="#" onclick="showLogin()">Already have an account? Login</a>
+  <p id="regMsg"></p>
+</div>
+
+<div class="container" id="loginForm" style="display:none;">
+  <h2>Login</h2>
+  <input type="email" id="loginEmail" placeholder="Email" required>
+  <input type="password" id="loginPassword" placeholder="Password" required>
+  <button onclick="login()">Login</button>
+  <a href="#" onclick="showRegister()">Don't have an account? Register</a>
+  <p id="loginMsg"></p>
+</div>
+
+<div class="container" id="dashboard" style="display:none;">
+  <h2>Welcome, <span id="userDisplay"></span>!</h2>
+  <p>You are successfully logged in.</p>
+  <button onclick="logout()">Logout</button>
+</div>
+
+<script>
+// Show login/register forms
+function showLogin() {
+  document.getElementById('registerForm').style.display = 'none';
+  document.getElementById('loginForm').style.display = 'block';
+  document.getElementById('dashboard').style.display = 'none';
+}
+function showRegister() {
+  document.getElementById('registerForm').style.display = 'block';
+  document.getElementById('loginForm').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'none';
+}
+
+// Register user
+function register() {
+  const username = document.getElementById('regUsername').value;
+  const email = document.getElementById('regEmail').value;
+  const password = document.getElementById('regPassword').value;
+  if(!username || !email || !password) {
+    document.getElementById('regMsg').textContent = 'All fields are required';
+    document.getElementById('regMsg').className = 'error';
+    return;
+  }
+  if(localStorage.getItem(email)) {
+    document.getElementById('regMsg').textContent = 'Email already registered';
+    document.getElementById('regMsg').className = 'error';
+    return;
+  }
+  // Store user in localStorage
+  const user = { username, email, password };
+  localStorage.setItem(email, JSON.stringify(user));
+  document.getElementById('regMsg').textContent = 'Registration successful!';
+  document.getElementById('regMsg').className = 'success';
+  setTimeout(showLogin, 1000);
+}
+
+// Login user
+function login() {
+  const email = document.getElementById('loginEmail').value;
+  const password = document.getElementById('loginPassword').value;
+  const user = JSON.parse(localStorage.getItem(email));
+  if(!user) {
+    document.getElementById('loginMsg').textContent = 'User not found';
+    document.getElementById('loginMsg').className = 'error';
+    return;
+  }
+  if(user.password !== password) {
+    document.getElementById('loginMsg').textContent = 'Incorrect password';
+    document.getElementById('loginMsg').className = 'error';
+    return;
+  }
+  // Show dashboard
+  document.getElementById('userDisplay').textContent = user.username;
+  document.getElementById('dashboard').style.display = 'block';
+  document.getElementById('registerForm').style.display = 'none';
+  document.getElementById('loginForm').style.display = 'none';
+}
+
+// Logout
+function logout() {
+  document.getElementById('dashboard').style.display = 'none';
+  showLogin();
+}
+</script>
+
+</body>
+</html>
